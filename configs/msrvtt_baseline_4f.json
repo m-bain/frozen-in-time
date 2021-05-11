@@ -1,0 +1,79 @@
+{
+    "name": "MSRVTTjsfusion_4f_stformer_pt-im21k",
+    "n_gpu": 4,
+    "arch": {
+        "type": "FrozenInTime",
+        "args": {
+            "video_params": {
+                "model": "SpaceTimeTransformer",
+                "arch_config": "base_patch16_224",
+                "num_frames": 4,
+                "pretrained": true,
+                "time_init": "zeros"
+            },
+            "text_params": {
+                "model": "distilbert-base-uncased",
+                "pretrained": true,
+                "input": "text"
+            },
+            "projection": "minimal"
+        }
+    },
+    "data_loader": {
+        "type": "TextVideoDataLoader",
+        "args":{
+            "dataset_name": "MSRVTT",
+            "data_dir": "$TMPDIR/MSRVTT/",
+            "shuffle": true,
+            "num_workers": 16,
+            "batch_size": 16,
+            "split": "train",
+            "cut": "jsfusion",
+            "subsample": 1,
+            "text_params": {
+                "input": "text"
+            },
+            "video_params": {
+                "extraction_fps": 25,
+                "extraction_res": 256,
+                "input_res": 224,
+                "num_frames": 4,
+                "stride": 1
+            }
+        }
+    },
+    "optimizer": {
+        "type": "AdamW",
+        "args":{
+            "lr": 3e-5
+        }
+    },
+    "loss": {
+        "type": "NormSoftmaxLoss",
+        "args": {
+        }
+    },
+    "metrics": [
+        "t2v_metrics",
+        "v2t_metrics"
+     ],
+    "trainer": {
+        "epochs": 100,
+        "max_samples_per_epoch": 9000,
+        "save_dir": "/work/maxbain/Libs/frozen-in-time",
+        "save_period": 5,
+        "verbosity": 2,
+        "monitor": "min val_loss",
+        "early_stop": 10,
+        "neptune": false
+    },
+    "visualizer": {
+        "type": "RetrievalVis",
+        "args": {
+            "src_video_dir": "$TMPDIR/MSRVTT/",
+            "vis_vid_freq": 1,
+            "num_samples": 20
+        }
+    }
+
+}
