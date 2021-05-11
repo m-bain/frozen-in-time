@@ -36,7 +36,8 @@ def state_dict_data_parallel_fix(load_state_dict, curr_state_dict):
         for k, v in load_state_dict.items():
             name = 'module.' + k  # remove `module.`
             new_state_dict[name] = v
-
+    else:
+        new_state_dict = load_state_dict
     return new_state_dict
 
 def print_numpy(x, val=True, shp=False):

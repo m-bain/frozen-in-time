@@ -6,7 +6,7 @@ from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassific
     BertTokenizer, T5EncoderModel
 import torch
 import timm
-
+from model.video_transformer import SpaceTimeTransformer
 
 class FrozenInTime(BaseModel):
     def __init__(self,
@@ -28,37 +28,19 @@ class FrozenInTime(BaseModel):
         self.text_model.train()
 
         pretrained = video_params['pretrained']
-        # TODO: lowkey maybe refactor this. to a get_model handler
         if video_params['model'] == "SpaceTimeTransformer":
             num_frames = video_params.get('num_frames', 4)
             time_init = video_params.get('time_init', 'zeros')
-            num_borders = video_params.get('num_borders', 0)
-            border_size = video_params.get('border_size', None)
-            attention_style = video_params.get('attention_style', 'ddst')
+            attention_style = video_params.get('attention_style', 'frozen-in-time')
             arch_config = video_params.get('arch_config', 'base_patch16_224')
             if arch_config == 'base_patch16_224':
                 vit_model = timm.models.vision_transformer.vit_base_patch16_224(pretrained=pretrained)
-                model = timm.models.vision_transformer.timesformer_base_patch16_224(num_frames=num_frames,
-                                                                                    time_init=time_init,
-                                                                                    num_borders=num_borders,
-                                                                                    border_size=border_size,
-                                                                                    attention_style=attention_style)
-            elif arch_config == 'base_patch32_384':
-                vit_model = timm.models.vision_transformer.vit_base_patch32_384(pretrained=True)
-                model = timm.models.vision_transformer.timesformer_base_patch32_384(num_frames=num_frames,
-                                                                                    time_init=time_init,
-                                                                                    num_borders=num_borders,
-                                                                                    border_size=border_size,
-                                                                                    attention_style=attention_style)
-            elif arch_config == 'base_patch16_384':
-                vit_model = timm.models.vision_transformer.vit_base_patch16_384(pretrained=True)
-                model = timm.models.vision_transformer.timesformer_base_patch16_384(num_frames=num_frames,
-                                                                                    time_init=time_init,
-                                                                                    num_borders=num_borders,
-                                                                                    border_size=border_size,
-                                                                                    attention_style=attention_style)
+                model = SpaceTimeTransformer(num_frames=num_frames,
+                                            time_init=time_init,
+                                            attention_style=attention_style)
             else:
                 raise NotImplementedError
+
             model.head = nn.Identity()
             model.pre_logits = nn.Identity()
             ftr_dim = model.embed_dim
@@ -81,6 +63,9 @@ class FrozenInTime(BaseModel):
             vid_proj = nn.Sequential(
                 nn.Linear(ftr_dim, projection_dim)
             )
+        elif projection == '':
+            txt_proj = nn.Identity()
+            vid_proj = nn.Identity()
         else:
             raise NotImplementedError
         self.txt_proj = txt_proj
@@ -166,6 +151,8 @@ class FrozenInTime(BaseModel):
             if load_num_patches != curr_pos_embed.shape[1]:
                 raise NotImplementedError(
                     'Loading models with different spatial resolution / patch number not yet implemented, sorry.')
+
+        return new_state_dict
 
 
 def sim_matrix(a, b, eps=1e-8):

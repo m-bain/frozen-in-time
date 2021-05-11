@@ -8,6 +8,13 @@ Repository to contain the code, models, data for end-to-end retrieval.
 
 Code provided to train end-to-end model on MSRVTT.
 
+Set path locations in `msrvtt_4f_i21k.json`
+
+
+`python train.py --config configs/msrvtt_4f_i21k.json`
+
+
+
 TODO:
 
 [ ] Conda env

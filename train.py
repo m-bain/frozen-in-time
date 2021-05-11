@@ -90,10 +90,8 @@ if __name__ == '__main__':
 
     if config['trainer']['neptune']:
         ex.observers.append(NeptuneObserver(
-            # for experiment tracking with Neptune.ai, fill in with your api token and project name.
-            # and make sure neptune: true in the config file.
-            api_token='',
-            project_name=''))
+            api_token='eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vdWkubmVwdHVuZS5haSIsImFwaV91cmwiOiJodHRwczovL3VpLm5lcHR1bmUuYWkiLCJhcGlfa2V5IjoiZTc0YTljY2YtMWNiMi00YWYyLTkyOGYtNmQ1MzgzMjc3NmY0In0=',
+            project_name='m-bain/frozen'))
         ex.run()
     else:
         run()

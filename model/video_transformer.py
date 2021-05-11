@@ -169,6 +169,8 @@ class SpaceTimeBlock(nn.Module):
                                  einops_to_space, f=space_f)
         if self.attention_style == 'frozen-in-time':
             space_residual = x + self.drop_path(space_output)
+        elif self.attention_style == 'timesformer':
+            space_residual = time_residual + self.drop_path(space_output)
         else:
             raise NotImplementedError
 
@@ -196,7 +198,7 @@ class SpaceTimeTransformer(nn.Module):
     def __init__(self, img_size=224, patch_size=16, in_chans=3, num_classes=1000, embed_dim=768, depth=12,
                  num_heads=12, mlp_ratio=4., qkv_bias=True, qk_scale=None, representation_size=None,
                  drop_rate=0., attn_drop_rate=0., drop_path_rate=0., hybrid_backbone=None, norm_layer=None,
-                 num_frames=8, time_init='rand', border_size=None, num_borders=0, attention_style='frozen-in-time'):
+                 num_frames=8, time_init='rand', attention_style='frozen-in-time'):
         """
         Args:
             img_size (int, tuple): input image size
@@ -234,15 +236,6 @@ class SpaceTimeTransformer(nn.Module):
                 img_size=img_size, patch_size=patch_size, in_chans=in_chans, embed_dim=embed_dim, num_frames=num_frames)
         num_patches = self.patch_embed.num_patches
         self.patches_per_frame = num_patches // num_frames
-        if border_size is not None:
-            if isinstance(patch_size, int):
-                patch_sizes = [patch_size, patch_size]
-            else:
-                patch_sizes = patch_size
-            num_border_patches = (border_size[1] // patch_sizes[1]) * (border_size[0] // patch_sizes[0]) * num_borders
-            self.patches_per_frame += num_border_patches
-        if num_borders not in [0, 2]:
-            raise NotImplementedError
 
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
         self.pos_embed = nn.Parameter(
@@ -287,8 +280,6 @@ class SpaceTimeTransformer(nn.Module):
         self.einops_from_time = 'b (f n) d'
         self.einops_to_time = '(b n) f d'
 
-        self.num_borders = num_borders
-        self.border_size = border_size
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
