@@ -33,6 +33,7 @@ class FrozenInTime(BaseModel):
             time_init = video_params.get('time_init', 'zeros')
             attention_style = video_params.get('attention_style', 'frozen-in-time')
             arch_config = video_params.get('arch_config', 'base_patch16_224')
+            vit_init = video_params.get('vit_init', 'imagenet-21k')
             if arch_config == 'base_patch16_224':
                 vit_model = timm.models.vision_transformer.vit_base_patch16_224(pretrained=pretrained)
                 model = SpaceTimeTransformer(num_frames=num_frames,

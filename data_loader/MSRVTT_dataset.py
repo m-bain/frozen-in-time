@@ -8,14 +8,13 @@ import random
 
 class MSRVTT(TextVideoDataset):
     def _load_metadata(self):
-        metadata_dir = '/scratch/shared/beegfs/maxbain/datasets/MSRVTT/'
-        json_fp = os.path.join(metadata_dir, 'annotation', 'MSR_VTT.json')
+        json_fp = os.path.join(self.metadata_dir, 'annotation', 'MSR_VTT.json')
         with open(json_fp, 'r') as fid:
             data = json.load(fid)
         df = pd.DataFrame(data['annotations'])
         img_data = pd.DataFrame(data['images'])
 
-        split_dir = os.path.join(metadata_dir, 'high-quality', 'structured-symlinks')
+        split_dir = os.path.join(self.metadata_dir, 'high-quality', 'structured-symlinks')
         js_test_cap_idx_path = None
         challenge_splits = {"val", "public_server_val", "public_server_test"}
         if self.cut == "miech":
@@ -47,10 +46,8 @@ class MSRVTT(TextVideoDataset):
 
         if self.split == 'train':
             df = df[df['image_id'].isin(train_df['videoid'])]
-            img_data = img_data[img_data['id'].isin(train_df['videoid'])]
         else:
             df = df[df['image_id'].isin(test_df['videoid'])]
-            img_data = img_data[img_data['id'].isin(test_df['videoid'])]
 
         self.metadata = df.groupby(['image_id'])['caption'].apply(list)
         if self.subsample < 1:
@@ -97,4 +94,5 @@ if __name__ == "__main__":
         res = ds.__getitem__(idx)
         print(idx)
         if [*res['video'].shape] != [4,3,224,224]:
+            print('error')
             import pdb; pdb.set_trace()

@@ -169,8 +169,6 @@ class SpaceTimeBlock(nn.Module):
                                  einops_to_space, f=space_f)
         if self.attention_style == 'frozen-in-time':
             space_residual = x + self.drop_path(space_output)
-        elif self.attention_style == 'timesformer':
-            space_residual = time_residual + self.drop_path(space_output)
         else:
             raise NotImplementedError
 

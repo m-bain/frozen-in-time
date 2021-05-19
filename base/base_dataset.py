@@ -13,6 +13,7 @@ class TextVideoDataset(Dataset):
                  text_params,
                  video_params,
                  data_dir,
+                 metadata_dir,
                  split='train',
                  tsfms=None,
                  cut=None,
@@ -23,6 +24,7 @@ class TextVideoDataset(Dataset):
         self.video_params = video_params
         # check for environment variables
         self.data_dir = os.path.expandvars(data_dir)
+        self.metadata_dir = os.path.expandvars(metadata_dir)
         self.split = split
         self.transforms = tsfms
         self.cut = cut
@@ -37,13 +39,7 @@ class TextVideoDataset(Dataset):
         pass
 
     def _get_caption(self, sample):
-        caption_sampling = self.text_params.get('caption_sample', 'rand')
-        if self.split in ['train', 'val'] and caption_sampling == "rand":
-            caption = random.choice(sample['captions'])
-        else:
-            caption = sample['captions'][0]
-
-        return caption
+        pass
 
     def __len__(self):
         return len(self.metadata)

@@ -10,6 +10,7 @@ Code provided to train end-to-end model on MSRVTT.
 
 Set path locations in `msrvtt_4f_i21k.json`
 
+`conda env create -f requirements/frozen.yml`
 
 `python train.py --config configs/msrvtt_4f_i21k.json`
 
@@ -17,9 +18,11 @@ Set path locations in `msrvtt_4f_i21k.json`
 
 TODO:
 
-[ ] Conda env
+[x] conda env
 
-[ ] Pretrained models
+[ ] msrvtt data zip
+
+[ ] pretrained models
 
 [ ] webvid data
 
