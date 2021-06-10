@@ -23,7 +23,7 @@
         "type": "TextVideoDataLoader",
         "args":{
             "dataset_name": "MSRVTT",
-            "data_dir": "$TMPDIR/MSRVTT/",
+            "data_dir": "data/MSRVTT/",
             "shuffle": true,
             "num_workers": 16,
             "batch_size": 16,
@@ -60,7 +60,7 @@
     "trainer": {
         "epochs": 100,
         "max_samples_per_epoch": 9000,
-        "save_dir": "/work/maxbain/Libs/frozen-in-time",
+        "save_dir": "exps",
         "save_period": 5,
         "verbosity": 2,
         "monitor": "min val_loss",
@@ -68,11 +68,8 @@
         "neptune": false
     },
     "visualizer": {
-        "type": "RetrievalVis",
+        "type": "",
         "args": {
-            "src_video_dir": "$TMPDIR/MSRVTT/",
-            "vis_vid_freq": 1,
-            "num_samples": 20
         }
     }
 

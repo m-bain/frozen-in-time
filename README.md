@@ -8,11 +8,13 @@ Repository to contain the code, models, data for end-to-end retrieval.
 
 Code provided to train end-to-end model on MSRVTT.
 
-Set path locations in `msrvtt_4f_i21k.json`
+1. Create conda env `conda env create -f requirements/frozen.yml`
 
-`conda env create -f requirements/frozen.yml`
+2. Download MSRVTT data `mkdir data; mkdir exps; wget https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/data/MSRVTT.zip -P data; unzip data/MSRVTT.zip -d data`
 
-`python train.py --config configs/msrvtt_4f_i21k.json`
+3. Train `python train.py --config configs/msrvtt_4f_i21k.json`
+
+4. Test `python test.py --resume exps/models/{EXP_NAME}/{EXP_TIMESTAMP}/model_best.pth`
 
 
 
@@ -20,7 +22,7 @@ TODO:
 
 [x] conda env
 
-[ ] msrvtt data zip
+[x] msrvtt data zip
 
 [ ] pretrained models
 

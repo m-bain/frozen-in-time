@@ -23,7 +23,6 @@ import torch
 from torch import nn, einsum
 from einops import rearrange, repeat
 from timm.models.layers import StdConv2dSame, DropPath, to_2tuple, trunc_normal_
-from timm.models import vision_transformer
 
 
 def attn(q, k, v):
