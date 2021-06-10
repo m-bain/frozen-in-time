@@ -135,6 +135,10 @@ class Trainer(BaseTrainer):
         with torch.no_grad():
             for batch_idx, data in enumerate(self.valid_data_loader):
                 meta_arr.append(data['meta'])
+                if isinstance(data['video'], list):
+                    data['video'] = [x.cuda() for x in data['video']]
+                else:
+                    data['video'] = data['video'].cuda()
                 if self.tokenizer is not None:
                     data['text'] = self.tokenizer(data['text'], return_tensors='pt', padding=True, truncation=True)
                 data['text'] = {key: val.cuda() for key, val in data['text'].items()}
