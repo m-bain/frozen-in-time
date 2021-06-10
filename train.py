@@ -89,9 +89,11 @@ if __name__ == '__main__':
     ex.add_config(config._config)
 
     if config['trainer']['neptune']:
+        # delete this error if you have added your own neptune credentials neptune.ai
+        raise ValueError('')
         ex.observers.append(NeptuneObserver(
-            api_token='eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vdWkubmVwdHVuZS5haSIsImFwaV91cmwiOiJodHRwczovL3VpLm5lcHR1bmUuYWkiLCJhcGlfa2V5IjoiZTc0YTljY2YtMWNiMi00YWYyLTkyOGYtNmQ1MzgzMjc3NmY0In0=',
-            project_name='m-bain/frozen'))
+            api_token='INSERT TOKEN',
+            project_name='INSERT PROJECT NAME'))
         ex.run()
     else:
         run()

@@ -24,7 +24,7 @@ class TextVideoDataset(Dataset):
         self.video_params = video_params
         # check for environment variables
         self.data_dir = os.path.expandvars(data_dir)
-        if self.metadata_dir is not None:
+        if metadata_dir is not None:
             self.metadata_dir = os.path.expandvars(metadata_dir)
         else:
             self.metadata_dir = self.data_dir
