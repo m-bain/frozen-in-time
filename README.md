@@ -18,7 +18,20 @@ Code provided to train end-to-end model on MSRVTT.
 
 5. Test `python test.py --resume exps/models/{EXP_NAME}/{EXP_TIMESTAMP}/model_best.pth`
 
+## Cite
 
+If you use this code in your research, please cite:
+
+<div class="highlight highlight-source-shell"><pre>
+@misc{bain2021frozen,
+      title={Frozen in Time: A Joint Video and Image Encoder for End-to-End Retrieval}, 
+      author={Max Bain and Arsha Nagrani and Gül Varol and Andrew Zisserman},
+      year={2021},
+      eprint={2104.00650},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+</pre></div>
 
 TODO:
 
