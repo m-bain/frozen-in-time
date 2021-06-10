@@ -12,9 +12,11 @@ Code provided to train end-to-end model on MSRVTT.
 
 2. Download MSRVTT data `mkdir data; mkdir exps; wget https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/data/MSRVTT.zip -P data; unzip data/MSRVTT.zip -d data`
 
-3. Train `python train.py --config configs/msrvtt_4f_i21k.json`
+3. Change `num_gpus` in the config file accordingly. 
 
-4. Test `python test.py --resume exps/models/{EXP_NAME}/{EXP_TIMESTAMP}/model_best.pth`
+4. Train `python train.py --config configs/msrvtt_4f_i21k.json`
+
+5. Test `python test.py --resume exps/models/{EXP_NAME}/{EXP_TIMESTAMP}/model_best.pth`
 
 
 

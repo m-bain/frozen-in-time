@@ -13,7 +13,7 @@ class TextVideoDataset(Dataset):
                  text_params,
                  video_params,
                  data_dir,
-                 metadata_dir,
+                 metadata_dir=None,
                  split='train',
                  tsfms=None,
                  cut=None,
@@ -24,7 +24,10 @@ class TextVideoDataset(Dataset):
         self.video_params = video_params
         # check for environment variables
         self.data_dir = os.path.expandvars(data_dir)
-        self.metadata_dir = os.path.expandvars(metadata_dir)
+        if self.metadata_dir is not None:
+            self.metadata_dir = os.path.expandvars(metadata_dir)
+        else:
+            self.metadata_dir = self.data_dir
         self.split = split
         self.transforms = tsfms
         self.cut = cut
