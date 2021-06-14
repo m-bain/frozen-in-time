@@ -2,7 +2,7 @@
 ### A Joint Video and Image Encoder for End-to-End Retrieval
 ([arXiv](https://arxiv.org/abs/2104.00650))
 ----
-Repository to contain the code, models, data for end-to-end retrieval.
+Repository to contain the code, models, data for end-to-end retrieval. WebVid data can be found [here](https://m-bain.github.io/webvid-dataset/)
 
 ### Work in progress ###
 
@@ -41,7 +41,7 @@ If you use this code in your research, please cite:
 
 [ ] pretrained models
 
-[ ] webvid data
+[x] webvid data [here](https://m-bain.github.io/webvid-dataset/)
 
 [ ] Other benchmarks 
 
