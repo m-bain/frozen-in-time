@@ -46,8 +46,10 @@ class MSRVTT(TextVideoDataset):
 
         if self.split == 'train':
             df = df[df['image_id'].isin(train_df['videoid'])]
+            img_data = img_data[img_data['id'].isin(train_df['videoid'])]
         else:
             df = df[df['image_id'].isin(test_df['videoid'])]
+            img_data = img_data[img_data['id'].isin(test_df['videoid'])]
 
         self.metadata = df.groupby(['image_id'])['caption'].apply(list)
         if self.subsample < 1:
@@ -63,7 +65,7 @@ class MSRVTT(TextVideoDataset):
         self.metadata = pd.DataFrame({'captions': self.metadata})
 
     def _get_video_path(self, sample):
-        return os.path.join(self.data_dir, 'videos', 'all', sample.name + '.mp4')
+        return os.path.join(self.data_dir, 'videos', 'all', sample.name + '.mp4'), sample.name + '.mp4'
 
     def _get_caption(self, sample):
         caption_sample = self.text_params.get('caption_sample', "rand")
@@ -72,27 +74,3 @@ class MSRVTT(TextVideoDataset):
         else:
             caption = sample['captions'][0]
         return caption
-
-
-if __name__ == "__main__":
-    from torchvision import transforms
-    from data_loader.data_loader import init_transform_dict
-    tparams = {}
-    vparams = {'num_frames': 4,
-               'input_res': 224,
-               }
-    ds = MSRVTT(tparams,
-           vparams,
-           '/scratch/shared/beegfs/maxbain/datasets/MSRVTT',
-           split='val',
-           cut="jsfusion",
-           tsfms=init_transform_dict()['val']
-           )
-
-
-    for idx in range(len(ds)):
-        res = ds.__getitem__(idx)
-        print(idx)
-        if [*res['video'].shape] != [4,3,224,224]:
-            print('error')
-            import pdb; pdb.set_trace()

@@ -6,17 +6,22 @@ import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
 import utils.visualizer as module_vis
+from utils.util import replace_nested_dict_item
 from parse_config import ConfigParser
 from trainer import Trainer
 from sacred import Experiment
 from neptunecontrib.monitoring.sacred import NeptuneObserver
 import transformers
+import os
 
 ex = Experiment('train')
+
+
 @ex.main
 def run():
     logger = config.get_logger('train')
-
+    os.environ['TOKENIZERS_PARALLELISM'] = "false"
+    # TODO: improve Create identity (do nothing) visualiser?
     if config['visualizer']['type'] != "":
         visualizer = config.initialize(
             name='visualizer',
@@ -28,14 +33,13 @@ def run():
         visualizer = None
 
     # build tokenizer
-    tokenizer = transformers.AutoTokenizer.from_pretrained(config['arch']['args']['text_params']['model'], TOKENIZERS_PARALLELISM=False)
+    tokenizer = transformers.AutoTokenizer.from_pretrained(config['arch']['args']['text_params']['model'],
+                                                           TOKENIZERS_PARALLELISM=False)
 
     # setup data_loader instances
-    data_loader = config.initialize('data_loader', module_data)
-    config['data_loader']['args']['split'] = 'val'
-    valid_data_loader = config.initialize('data_loader', module_data)
-    print('Train dataset: ', len(data_loader.sampler), ' samples')
-    print('Val dataset: ', len(valid_data_loader.sampler), ' samples')
+    data_loader, valid_data_loader = init_dataloaders(config, module_data)
+    print('Train dataset: ', [x.n_samples for x in data_loader], ' samples')
+    print('Val dataset: ', [x.n_samples for x in valid_data_loader], ' samples')
     # build model architecture, then print to console
     model = config.initialize('arch', module_arch)
     logger.info(model)
@@ -65,8 +69,32 @@ def run():
                       writer=writer,
                       tokenizer=tokenizer,
                       max_samples_per_epoch=config['trainer']['max_samples_per_epoch'])
-
     trainer.train()
+
+
+def init_dataloaders(config, module_data):
+    """
+    We need a way to change split from 'train' to 'val'.
+    """
+    if "type" in config["data_loader"] and "args" in config["data_loader"]:
+        # then its a single dataloader
+        data_loader = [config.initialize("data_loader", module_data)]
+        config['data_loader']['args'] = replace_nested_dict_item(config['data_loader']['args'], 'split', 'val')
+        valid_data_loader = [config.initialize("data_loader", module_data)]
+    elif isinstance(config["data_loader"], list):
+        data_loader = [config.initialize('data_loader', module_data, index=idx) for idx in
+                       range(len(config['data_loader']))]
+        new_cfg_li = []
+        for dl_cfg in config['data_loader']:
+            dl_cfg['args'] = replace_nested_dict_item(dl_cfg['args'], 'split', 'val')
+            new_cfg_li.append(dl_cfg)
+        config._config['data_loader'] = new_cfg_li
+        valid_data_loader = [config.initialize('data_loader', module_data, index=idx) for idx in
+                             range(len(config['data_loader']))]
+    else:
+        raise ValueError("Check data_loader config, not correct format.")
+
+    return data_loader, valid_data_loader
 
 
 if __name__ == '__main__':
@@ -90,7 +118,7 @@ if __name__ == '__main__':
 
     if config['trainer']['neptune']:
         # delete this error if you have added your own neptune credentials neptune.ai
-        raise ValueError('')
+        raise ValueError('Neptune credentials not set up yet.')
         ex.observers.append(NeptuneObserver(
             api_token='INSERT TOKEN',
             project_name='INSERT PROJECT NAME'))

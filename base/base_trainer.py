@@ -19,6 +19,7 @@ class BaseTrainer:
         if len(device_ids) > 1:
             self.model = torch.nn.DataParallel(model, device_ids=device_ids)
 
+        loss = loss.to(self.device)
         self.loss = loss
         self.metrics = metrics
         self.optimizer = optimizer
@@ -27,6 +28,7 @@ class BaseTrainer:
         self.epochs = cfg_trainer['epochs']
         self.save_period = cfg_trainer['save_period']
         self.monitor = cfg_trainer.get('monitor', 'off')
+        self.init_val = cfg_trainer.get('init_val', True)
 
         # configuration to monitor model performance and save best
         if self.monitor == 'off':
@@ -96,7 +98,8 @@ class BaseTrainer:
                     # NOTE: currently only supports two layers of nesting
                     for subkey, subval in value.items():
                         for subsubkey, subsubval in subval.items():
-                            log[f"val_{subkey}_{subsubkey}"] = subsubval
+                            for subsubsubkey, subsubsubval in subsubval.items():
+                                log[f"val_{subkey}_{subsubkey}_{subsubsubkey}"] = subsubsubval
                 else:
                     log[key] = value
 
@@ -129,8 +132,8 @@ class BaseTrainer:
                                      "Training stops.".format(self.early_stop))
                     break
 
-            #if epoch % self.save_period == 0 or best:
-            if best:
+            if epoch % self.save_period == 0 or best:
+            #if best:
                 self._save_checkpoint(epoch, save_best=best)
 
     def _prepare_device(self, n_gpu_use):

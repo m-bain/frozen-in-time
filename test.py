@@ -2,14 +2,13 @@ import argparse
 import torch
 from tqdm import tqdm
 import data_loader.data_loader as module_data
-import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
 from parse_config import ConfigParser
 from model.model import sim_matrix
-
+import pandas as pd
+import numpy as np
 from sacred import Experiment
-from neptunecontrib.monitoring.sacred import NeptuneObserver
 import transformers
 from utils.util import state_dict_data_parallel_fix
 from trainer.trainer import verbose
@@ -20,6 +19,8 @@ def run():
 
     # setup data_loader instances
     config._config['data_loader']['args']['split'] = 'test'
+    config._config['data_loader']['args']['shuffle'] = False
+    config._config['data_loader']['args']['sliding_window_stride'] = config._config['sliding_window_stride']
     data_loader = config.initialize('data_loader', module_data)
     tokenizer = transformers.AutoTokenizer.from_pretrained(config['arch']['args']['text_params']['model'])
 
@@ -70,8 +71,8 @@ def run():
     text_embeds = torch.cat(text_embed_arr)
     vid_embeds = torch.cat(vid_embed_arr)
 
+    mask = None
     if data_loader.dataset.sliding_window_stride != -1:
-        import pandas as pd
         cpu_vid_embeds = vid_embeds.cpu().detach()
         cpu_text_embeds = text_embeds.cpu().detach()
 
@@ -83,7 +84,6 @@ def run():
                                'captions': raw_caps})
         new_vid_embeds = []
         new_txt_embeds = []
-
         for vid in vid_df['videoid'].unique():
             tdf = vid_df[vid_df['videoid'] == vid]
             tvembeds = torch.stack(tdf['vid_embed'].values.tolist())
@@ -102,18 +102,14 @@ def run():
     sims = sims.detach().cpu().numpy()
 
     nested_metrics = {}
-
     for metric in metric_fns:
         metric_name = metric.__name__
-        res = metric(sims)
+        res = metric(sims, query_masks=mask)
         verbose(epoch=0, metrics=res, name="", mode=metric_name)
         nested_metrics[metric_name] = res
 
-    if config.config['visualizer']:
-        meta_arr_cat = {key: [] for key in meta_arr[0]}
-        for meta in meta_arr:
-            for key, val in meta.items():
-                meta_arr_cat[key] += val
+    #if config.config['visualizer']:
+    #    raise NotImplementedError
 
 if __name__ == '__main__':
     args = argparse.ArgumentParser(description='PyTorch Template')
@@ -124,9 +120,13 @@ if __name__ == '__main__':
                       help='indices of GPUs to enable (default: all)')
     args.add_argument('-c', '--config', default=None, type=str,
                       help='config file path (default: None)')
+    args.add_argument('-s', '--sliding_window_stride', default=-1, type=int,
+                      help='test time temporal augmentation, repeat samples with different start times.')
 
     config = ConfigParser(args, test=True)
-
+    # hack to get sliding into config
+    args = args.parse_args()
+    config._config['sliding_window_stride'] = args.sliding_window_stride
     ex.add_config(config.config)
 
     ex.run()

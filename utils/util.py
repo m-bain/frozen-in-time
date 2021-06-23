@@ -12,6 +12,15 @@ import msgpack
 import humanize
 import os
 
+def replace_nested_dict_item(obj, key, replace_value):
+    for k, v in obj.items():
+        if isinstance(v, dict):
+            obj[k] = replace_nested_dict_item(v, key, replace_value)
+    if key in obj:
+        obj[key] = replace_value
+    return obj
+
+
 def state_dict_data_parallel_fix(load_state_dict, curr_state_dict):
     load_keys = list(load_state_dict.keys())
     curr_keys = list(curr_state_dict.keys())

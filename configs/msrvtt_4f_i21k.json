@@ -16,7 +16,8 @@
                 "pretrained": true,
                 "input": "text"
             },
-            "projection": "minimal"
+            "projection": "minimal",
+            "load_checkpoint" : ""
         }
     },
     "data_loader": {
