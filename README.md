@@ -56,7 +56,7 @@ For finetuning a pretrained model, set `"load_checkpoint": "PATH_TO_MODEL"` in t
 
 ### Pretrained Weights
 
- * [CC-3M+WebVid-2M, 4-frames, base_patch_16_224](https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/models/cc-webvid2m-4f_stformer_b_16_224.pth)
+ * [CC-3M+WebVid-2M, 4-frames, base_patch_16_224](https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/models/cc-webvid2m-4f_stformer_b_16_224.pth.tar)
 
 
 
