@@ -23,9 +23,9 @@ Repository containing the code, models, data for end-to-end retrieval. WebVid da
 
 4. Test `python test.py --resume exps/models/{EXP_NAME}/{EXP_TIMESTAMP}/model_best.pth`
 
-For finetuning a pretrained model, set `"load_checkpoint": "FULL_MODEL_PATH"` in the config file.
+For finetuning a pretrained model, set `"load_checkpoint": "PATH_TO_MODEL"` in the config file.
 
-### Pre-training
+### Pretraining
 
 1. Download WebVid-2M (see https://github.com/m-bain/webvid-dataset)
 
@@ -53,6 +53,12 @@ For finetuning a pretrained model, set `"load_checkpoint": "FULL_MODEL_PATH"` in
     **c. Finetuning**
     
     Set `"load_checkpoint": "FULL_MODEL_PATH"` in the config file. You can now use different experiment params, such as num_frames, to do curriculum learning for example.
+
+### Pretrained Weights
+
+ * [CC-3M+WebVid-2M, 4-frames, base_patch_16_224](https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/models/cc-webvid2m-4f_stformer_b_16_224.pth)
+
+
 
 ### Experiment Logging and Visualising
 This repository uses a sacred backbone for logging and tracking experiments, with a neptune front end. It makes life a lot easier.

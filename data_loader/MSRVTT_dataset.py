@@ -12,7 +12,6 @@ class MSRVTT(TextVideoDataset):
         with open(json_fp, 'r') as fid:
             data = json.load(fid)
         df = pd.DataFrame(data['annotations'])
-        img_data = pd.DataFrame(data['images'])
 
         split_dir = os.path.join(self.metadata_dir, 'high-quality', 'structured-symlinks')
         js_test_cap_idx_path = None
@@ -46,10 +45,8 @@ class MSRVTT(TextVideoDataset):
 
         if self.split == 'train':
             df = df[df['image_id'].isin(train_df['videoid'])]
-            img_data = img_data[img_data['id'].isin(train_df['videoid'])]
         else:
             df = df[df['image_id'].isin(test_df['videoid'])]
-            img_data = img_data[img_data['id'].isin(test_df['videoid'])]
 
         self.metadata = df.groupby(['image_id'])['caption'].apply(list)
         if self.subsample < 1:
