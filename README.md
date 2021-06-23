@@ -48,7 +48,7 @@ For finetuning a pretrained model, set `"load_checkpoint": "FULL_MODEL_PATH"` in
     N.B. More frames requires = more gpu memory.
     
     If, like us, you are not a big company and have limited compute, then you will benefit by training via a curriculum on the number of frames.
-    A lot of the knowledge can be learned from 1-frames, as we show in the paper. You can then finetune with more frames.
+    A lot of the knowledge can be learned in the 1-frame setting, as we show in the paper. You can then finetune with more frames.
     
     **c. Finetuning**
     
@@ -57,7 +57,7 @@ For finetuning a pretrained model, set `"load_checkpoint": "FULL_MODEL_PATH"` in
 ### Experiment Logging and Visualising
 This repository uses a sacred backbone for logging and tracking experiments, with a neptune front end. It makes life a lot easier.
 If you want to activate this:
-1. Create a [neptune](neptune.ai) account.
+1. Create a [neptune](www.neptune.ai) account.
 2. Create a project, copy in your credentials in `train.py` and remove the ValueError
 3. Set `neptune: true` in your config files.
 
