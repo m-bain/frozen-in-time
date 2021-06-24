@@ -72,7 +72,7 @@ If you want to activate this:
 
 If you use this code in your research, please cite:
 
-<div class="highlight highlight-source-shell"><pre>
+```bibtex
 @misc{bain2021frozen,
       title={Frozen in Time: A Joint Video and Image Encoder for End-to-End Retrieval}, 
       author={Max Bain and Arsha Nagrani and Gül Varol and Andrew Zisserman},
@@ -81,7 +81,7 @@ If you use this code in your research, please cite:
       archivePrefix={arXiv},
       primaryClass={cs.CV}
 }
-</pre></div>
+```
 
 
 ## Acknowledgements
