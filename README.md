@@ -27,7 +27,7 @@ For finetuning a pretrained model, set `"load_checkpoint": "PATH_TO_MODEL"` in t
 
 ### Pretraining
 
-1. Download WebVid-2M (see https://github.com/m-bain/webvid-dataset)
+1. Download WebVid-2M (see https://github.com/m-bain/webvid)
 
 2. Download CC-3M (see https://ai.google.com/research/ConceptualCaptions/download)
 
@@ -63,7 +63,7 @@ For finetuning a pretrained model, set `"load_checkpoint": "PATH_TO_MODEL"` in t
 ### Experiment Logging and Visualising
 This repository uses a sacred backbone for logging and tracking experiments, with a neptune front end. It makes life a lot easier.
 If you want to activate this:
-1. Create a [neptune](https://neptune.ai) account.
+1. Create a [neptune.ai](https://neptune.ai) account.
 2. Create a project, copy in your credentials in `train.py` and remove the ValueError
 3. Set `neptune: true` in your config files.
 
