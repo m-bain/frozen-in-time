@@ -141,7 +141,15 @@ class Trainer(BaseTrainer):
                         data['text'] = self.tokenizer(data['text'], return_tensors='pt', padding=True, truncation=True)
                     data['text'] = {key: val.to(self.device) for key, val in data['text'].items()}
                     data['video'] = data['video'].to(self.device)
-                    text_embed, vid_embed = self.model(data, return_embeds=True)
+
+                    if isinstance(self.model, nn.DataParallel) and data["video"].shape[0] < len(self.model.device_ids):
+                        # Note that if some batch has size smaller than the GPU size, `DataParallel` will fail.
+                        # It can happen with the last batch of the dataset, depending on its size.
+                        # This avoids using `DataParallel` in this case, and supposes the entire batch fits in one GPU.
+                        text_embed, vid_embed = self.model.module(data, return_embeds=True)
+                    else:
+                        text_embed, vid_embed = self.model(data, return_embeds=True)
+
                     text_embed_arr[dl_idx].append(text_embed.cpu())
                     vid_embed_arr[dl_idx].append(vid_embed.cpu())
                     sims_batch = sim_matrix(text_embed, vid_embed)
