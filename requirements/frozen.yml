@@ -69,6 +69,7 @@ dependencies:
   - mkl_random=1.2.1=py37ha9443f7_2
   - msgpack-python=1.0.2=py37hff7bd54_1
   - ncurses=6.2=he6710b0_1
+  - ninja=1.10.2=hff7bd54_1
   - numpy=1.20.1=py37h93e21f0_0
   - numpy-base=1.20.1=py37h7d8b39e_0
   - olefile=0.46=py37_0
@@ -142,10 +143,8 @@ dependencies:
     - munch==2.5.0
     - neptune-client==0.9.9
     - neptune-contrib==0.27.1
-    - ninja==1.10.0.post2
     - oauthlib==3.1.0
     - pillow==8.3.1
-    - protobuf==3.17.0
     - py-cpuinfo==8.0.0
     - pyjwt==2.1.0
     - pyrsistent==0.17.3
@@ -157,9 +156,8 @@ dependencies:
     - smmap==4.0.0
     - strict-rfc3339==0.7
     - swagger-spec-validator==2.7.3
-    - tensorboardx==1.8
     - timm==0.4.5
-    - torchvision==0.9.1
+    - torchvision==0.9.1+cu111
     - webcolors==1.11.1
     - websocket-client==0.59.0
     - wrapt==1.12.1
