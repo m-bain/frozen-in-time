@@ -6,14 +6,14 @@ project page | [arXiv](https://arxiv.org/abs/2104.00650) | [webvid-data](https:/
 Repository containing the code, models, data for end-to-end retrieval. WebVid data can be found [here](https://m-bain.github.io/webvid-dataset/)
 
 ----
-###📝 Preparation 
+### 📝 Preparation 
 
 1. Create conda env `conda env create -f requirements/frozen.yml`
 
 2. Create data / experiment folders `mkdir data; mkdir exps`, note this can just be a symlink to where you want to store big data.
 
 
-###🔧 Finetuning (benchmarks: MSR-VTT)
+### 🔧 Finetuning (benchmarks: MSR-VTT)
 
 1. `wget https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/data/MSRVTT.zip -P data; unzip data/MSRVTT.zip -d data`
 
@@ -25,7 +25,7 @@ Repository containing the code, models, data for end-to-end retrieval. WebVid da
 
 For finetuning a pretrained model, set `"load_checkpoint": "PATH_TO_MODEL"` in the config file.
 
-###🏋️‍️ Pretraining
+### 🏋️‍️ Pretraining
 
 1. Download WebVid-2M (see https://github.com/m-bain/webvid)
 
@@ -54,17 +54,17 @@ For finetuning a pretrained model, set `"load_checkpoint": "PATH_TO_MODEL"` in t
     
     Set `"load_checkpoint": "FULL_MODEL_PATH"` in the config file. You can now use different experiment params, such as num_frames, to do curriculum learning for example.
 
-###🗄 Pretrained Weights
+### 🗄 Pretrained Weights
 
  * [CC-3M+WebVid-2M, 4-frames, base_patch_16_224](https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/models/cc-webvid2m-4f_stformer_b_16_224.pth.tar)
 
-###📚 Curriculum Learning on #frames
+### 📚 Curriculum Learning on #frames
     
-Curriculum learning on the number of frames in pretraining achieves similar performance with significant reduction in compute (both memory and training time). This is because model has higher throughput for fewer frames, as well as bigger batch size fitting  on the GPU.
+Curriculum learning on the number of frames in pretraining achieves similar performance with significant reduction in compute (both memory and training time). This is because model has higher throughput for fewer frames, as well as allowing a bigger batch size for the same gpu memory.
 
 Our best model was trained on 1-frame then finetuned on 4-frames on CC+WebVid2M.
 
-Train on 1-frame until the training loss converges, then finetune 4-frames with the same config and loading the 1-frame checkpoint via `load_checkpoint` in config file. 4-frame finetuning needs much less iterations (~10% of 1-frame setting is sufficient).
+Train on 1-frame until the training loss converges, then finetune on 4-frames with the same config, from the 1-frame checkpoint via setting `load_checkpoint` in config file. 4-frame finetuning needs much less iterations (~10% of 1-frame setting is sufficient) since most of the knowledge is learned in the 1-frame setting.
 
 
 ###  📈 Experiment Logging and Visualising
@@ -75,7 +75,7 @@ If you want to activate this:
 3. Set `neptune: true` in your config files.
 
 
-##🎓 Cite
+## 🎓 Cite
 
 If you use this code in your research, please cite:
 
