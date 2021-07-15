@@ -122,6 +122,7 @@ dependencies:
   - zlib=1.2.11=h7b6447c_3
   - zstd=1.4.9=haebb681_0
   - pip:
+    - --find-links https://download.pytorch.org/whl/torch_stable.html
     - attrdict==2.0.1
     - attrs==21.2.0
     - bravado==11.0.3
