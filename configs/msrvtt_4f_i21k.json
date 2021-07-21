@@ -64,7 +64,7 @@
         "save_dir": "exps",
         "save_period": 5,
         "verbosity": 2,
-        "monitor": "min val_loss",
+        "monitor": "min val_loss_0",
         "early_stop": 10,
         "neptune": false
     },
