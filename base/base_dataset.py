@@ -2,6 +2,8 @@ import random
 import cv2
 import av
 import os
+
+import decord
 import numpy as np
 import torch
 from PIL import Image, ImageFile
@@ -296,6 +298,19 @@ def read_frames_av(video_path, num_frames, sample='rand', fix_start=None):
     return frames, frame_idxs
 
 
+decord.bridge.set_bridge("torch")
+
+
+def read_frames_decord(video_path, num_frames, sample='rand', fix_start=None):
+    video_reader = decord.VideoReader(video_path, num_threads=1)
+    vlen = len(video_reader)
+    frame_idxs = sample_frames(num_frames, vlen, sample=sample, fix_start=fix_start)
+    frames = video_reader.get_batch(frame_idxs)
+    frames = frames.float() / 255
+    frames = frames.permute(0, 3, 1, 2)
+    return frames, frame_idxs
+
+
 def get_video_len(video_path):
     cap = cv2.VideoCapture(video_path)
     if not (cap.isOpened()):
@@ -307,5 +322,6 @@ def get_video_len(video_path):
 
 video_reader = {
     'av': read_frames_av,
-    'cv2': read_frames_cv2
+    'cv2': read_frames_cv2,
+    'decord': read_frames_decord
 }

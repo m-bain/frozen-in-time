@@ -129,6 +129,7 @@ dependencies:
     - bravado-core==5.17.0
     - colorama==0.4.4
     - cycler==0.10.0
+    - decord==0.6.0
     - dominate==2.6.0
     - einops==0.3.0
     - future==0.18.2
