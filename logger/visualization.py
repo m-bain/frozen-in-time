@@ -12,7 +12,6 @@ class TensorboardWriter:
             log_dir = str(log_dir)
 
             # Retrieve visualization writer.
-            succeeded = False
             for module in ["torch.utils.tensorboard", "tensorboardX"]:
                 try:
                     self.writer = importlib.import_module(module).SummaryWriter(log_dir)
