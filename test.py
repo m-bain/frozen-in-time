@@ -1,17 +1,19 @@
 import argparse
+
+import pandas as pd
 import torch
+import transformers
+from sacred import Experiment
 from tqdm import tqdm
+
 import data_loader.data_loader as module_data
 import model.metric as module_metric
 import model.model as module_arch
-from parse_config import ConfigParser
 from model.model import sim_matrix
-import pandas as pd
-import numpy as np
-from sacred import Experiment
-import transformers
-from utils.util import state_dict_data_parallel_fix
+from parse_config import ConfigParser
 from trainer.trainer import verbose
+from utils.util import state_dict_data_parallel_fix
+
 ex = Experiment('test')
 
 @ex.main

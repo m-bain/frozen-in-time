@@ -1,13 +1,14 @@
-import os
+import inspect
 import logging
-from pathlib import Path
+import os
+import time
+from datetime import datetime
 from functools import reduce
 from operator import getitem
-from datetime import datetime
+from pathlib import Path
+
 from logger import setup_logging
 from utils import read_json, write_json
-import time
-import inspect
 
 
 class ConfigParser:
@@ -78,7 +79,7 @@ class ConfigParser:
         if index is None:
             module_name = self[name]['type']
             module_args = dict(self[name]['args'])
-            assert all([k not in module_args for k in kwargs]), 'Overwriting kwargs given in config file is not allowed'
+            assert all(k not in module_args for k in kwargs), 'Overwriting kwargs given in config file is not allowed'
             module_args.update(kwargs)
         else:
             module_name = self[name][index]['type']

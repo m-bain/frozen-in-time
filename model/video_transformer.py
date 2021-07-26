@@ -17,12 +17,13 @@ https://github.com/lucidrains/TimeSformer-pytorch
 Hacked together by Max Bain
 """
 
-from functools import partial
 from collections import OrderedDict
+from functools import partial
+
 import torch
-from torch import nn, einsum
 from einops import rearrange, repeat
-from timm.models.layers import StdConv2dSame, DropPath, to_2tuple, trunc_normal_
+from timm.models.layers import DropPath, to_2tuple, trunc_normal_
+from torch import einsum, nn
 
 
 def attn(q, k, v):

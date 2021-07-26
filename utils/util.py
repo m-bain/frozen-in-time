@@ -1,16 +1,17 @@
+import functools
 import json
-from pathlib import Path
+import os
+import socket
+import time
+from collections import OrderedDict
 from datetime import datetime
 from itertools import repeat
-from collections import OrderedDict
-import functools
-import time
-import socket
+from pathlib import Path
+
+import humanize
 import numpy as np
 import psutil
-import msgpack
-import humanize
-import os
+
 
 def replace_nested_dict_item(obj, key, replace_value):
     for k, v in obj.items():

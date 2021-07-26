@@ -1,8 +1,9 @@
 import importlib
+
 from utils import Timer
 
 
-class TensorboardWriter():
+class TensorboardWriter:
     def __init__(self, log_dir, logger, enabled):
         self.writer = None
         self.selected_module = ""
@@ -10,7 +11,7 @@ class TensorboardWriter():
         if enabled:
             log_dir = str(log_dir)
 
-            # Retrieve vizualization writer.
+            # Retrieve visualization writer.
             succeeded = False
             for module in ["torch.utils.tensorboard", "tensorboardX"]:
                 try:
@@ -74,6 +75,6 @@ class TensorboardWriter():
             return attr
 
 
-class SacredNeptuneWriter():
+class SacredNeptuneWriter:
     def __init__(self):
         raise NotImplementedError

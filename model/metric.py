@@ -1,20 +1,15 @@
-
 """Module for computing performance metrics
 
 """
-import math
-import numbers
 from pathlib import Path
-import ipdb
+
 import numpy as np
-import torch
 import scipy.stats
-from sklearn.metrics import average_precision_score
-import ipdb
-import pdb
+import torch
+
 
 def t2v_metrics(sims, query_masks=None):
-    """Compute retrieval metrics from a similiarity matrix.
+    """Compute retrieval metrics from a similarity matrix.
 
     Args:
         sims (th.Tensor): N x M matrix of similarities between embeddings, where
@@ -121,7 +116,7 @@ def t2v_metrics(sims, query_masks=None):
 
 
 def v2t_metrics(sims, query_masks=None):
-    """Compute retrieval metrics from a similiarity matrix.
+    """Compute retrieval metrics from a similarity matrix.
 
     Args:
         sims (th.Tensor): N x M matrix of similarities between embeddings, where
@@ -213,7 +208,7 @@ def v2t_metrics(sims, query_masks=None):
 
 
 def retrieval_as_classification(sims, query_masks=None):
-    """Compute classification metrics from a similiarity matrix.
+    """Compute classification metrics from a similarity matrix.
     """
     assert sims.ndim == 2, "expected a matrix"
 
