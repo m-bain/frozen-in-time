@@ -96,10 +96,14 @@ class TextVideoDataset(Dataset):
             fix_start = sample['fix_start']
 
         try:
-            imgs, idxs = self.video_reader(video_fp, self.video_params['num_frames'], frame_sample, fix_start=fix_start)
-        except:
+            if os.path.isfile(video_fp):
+                imgs, idxs = self.video_reader(video_fp, self.video_params['num_frames'], frame_sample, fix_start=fix_start)
+            else:
+                print(f"Warning: missing video file {video_fp}.")
+                assert False
+        except Exception as e:
             if video_loading == 'strict':
-                raise ValueError(f'Video loading failed for {video_fp}, video loading for this dataset is strict.')
+                raise ValueError(f'Video loading failed for {video_fp}, video loading for this dataset is strict.') from e
             else:
                 imgs = Image.new('RGB', (self.video_params['input_res'], self.video_params['input_res']), (0, 0, 0))
                 imgs = transforms.ToTensor()(imgs).unsqueeze(0)
