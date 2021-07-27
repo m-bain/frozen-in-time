@@ -4,10 +4,12 @@ It is based on the Cycle-GAN codebase:
 https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
 """
 import os
-import numpy as np
 from pathlib import Path
-from . import util, html
-import pdb
+
+import numpy as np
+
+from . import html
+
 
 class RetrievalVis:
     """This class includes several functions that can display/save images.

@@ -1,10 +1,11 @@
 import numbers
+from typing import List, Tuple
+
 import torch
 from torch import Tensor
-from typing import List, Tuple, Any, Optional
-from torchvision.transforms import functional_pil as F_pil
-from torchvision.transforms import functional_tensor as F_t
+from torchvision.transforms import functional_pil as F_pil, functional_tensor as F_t
 from torchvision.transforms.functional import center_crop, crop
+
 
 def _get_image_size(img: Tensor) -> List[int]:
     """Returns image size as [w, h]

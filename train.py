@@ -1,18 +1,18 @@
 import argparse
 import collections
-import torch
+import os
+
+import transformers
+from sacred import Experiment
+
 import data_loader.data_loader as module_data
 import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
 import utils.visualizer as module_vis
-from utils.util import replace_nested_dict_item
 from parse_config import ConfigParser
 from trainer import Trainer
-from sacred import Experiment
-from neptunecontrib.monitoring.sacred import NeptuneObserver
-import transformers
-import os
+from utils.util import replace_nested_dict_item
 
 ex = Experiment('train')
 

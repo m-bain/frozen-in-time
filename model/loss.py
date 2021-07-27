@@ -1,7 +1,7 @@
-import torch.nn as nn
 import torch as th
 import torch.nn.functional as F
-import torch
+from torch import nn
+
 
 class NormSoftmaxLoss(nn.Module):
     def __init__(self, temperature=0.05):

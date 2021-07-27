@@ -1,10 +1,9 @@
-from base.base_dataset import TextImageDataset
-import pandas as pd
 import os
-import json
-import numpy as np
-import random
 import zlib
+
+import pandas as pd
+
+from base.base_dataset import TextImageDataset
 
 
 class ConceptualCaptions3M(TextImageDataset):
