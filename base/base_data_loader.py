@@ -94,13 +94,12 @@ class BaseMultiDataLoader:
     def __init__(self, dataloaders):
         self.dataloaders = dataloaders
         self.batch_size = self.dataloaders[0].batch_size
-
     def __getitem__(self, item):
         dl_idx = item % len(self.dataloaders)
         return next(iter(self.dataloaders[dl_idx]))
 
     def __len__(self):
-        return min(len(x) for x in self.dataloaders) * len(self.dataloaders)
+        return min([len(x) for x in self.dataloaders]) * len(self.dataloaders)
 
     def num_samples(self):
-        return sum(len(x.sampler) for x in self.dataloaders)
+        return sum([len(x.sampler) for x in self.dataloaders])

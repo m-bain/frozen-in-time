@@ -1,9 +1,11 @@
-import matplotlib
-import numpy as np
 import torch
+import numpy as np
+import matplotlib
 
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
+import ipdb
 
 def visualise_path(pred, target, window):
     """
@@ -26,11 +28,11 @@ def visualise_path(pred, target, window):
 
     for t in target:
         local_idx = local_idxs.index(t[0])
-        grid[:, local_idx, t[1]] = gt
+        grid[:, local_idx,t[1]] = gt
 
     for p in pred:
         local_idx = local_idxs.index(p[0])
-        if (grid[:, local_idx, p[1]] == gt).all():
+        if (grid[:, local_idx,p[1]] == gt).all():
             grid[:, local_idx, p[1]] = tp
         else:
             grid[:, local_idx, p[1]] = fp
@@ -39,6 +41,7 @@ def visualise_path(pred, target, window):
 
 
 def batch_path_vis(pred_dict, target, window):
+
     grids = []
 
     window = window.cpu()
@@ -51,8 +54,9 @@ def batch_path_vis(pred_dict, target, window):
     return torch.stack(grids)
 
 
+
 if __name__ == "__main__":
-    pred = [[1, 1], [2, 4]]
-    gt = [[1, 1], [3, 4]]
-    window = torch.zeros((5, 6))
+    pred = [[1,1], [2,4]]
+    gt = [[1,1], [3,4]]
+    window = torch.zeros((5,6))
     visualise_path(pred, gt, window)

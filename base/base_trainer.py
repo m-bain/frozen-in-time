@@ -1,7 +1,7 @@
-from abc import abstractmethod
-
 import torch
+from abc import abstractmethod
 from numpy import inf
+from logger import TensorboardWriter
 
 
 class BaseTrainer:

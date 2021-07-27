@@ -1,10 +1,10 @@
 import numpy as np
 import torch
-from torch import nn
-
+from torchvision.utils import make_grid
 from base import BaseTrainer
-from model.model import sim_matrix
 from utils import inf_loop
+from model.model import sim_matrix
+from itertools import cycle
 
 
 class Trainer(BaseTrainer):
@@ -24,7 +24,7 @@ class Trainer(BaseTrainer):
         if len_epoch is None:
             # epoch-based training
             # take the min
-            self.len_epoch = min(len(x) for x in data_loader)
+            self.len_epoch = min([len(x) for x in data_loader])
         else:
             # iteration-based training
             self.data_loader = inf_loop(data_loader)
@@ -37,7 +37,7 @@ class Trainer(BaseTrainer):
         self.val_chunking = True
         self.batch_size = self.data_loader[0].batch_size
         self.log_step = int(np.sqrt(self.batch_size))
-        self.total_batch_sum = sum(x.batch_size for x in self.data_loader)
+        self.total_batch_sum = sum([x.batch_size for x in self.data_loader])
         self.tokenizer = tokenizer
         self.max_samples_per_epoch = max_samples_per_epoch
 
@@ -67,6 +67,7 @@ class Trainer(BaseTrainer):
         """
         self.model.train()
         total_loss = [0] * len(self.data_loader)
+        total_metrics = np.zeros(len(self.metrics))
         for batch_idx, data_li in enumerate(zip(*self.data_loader)):
             if (batch_idx + 1) * self.total_batch_sum > self.max_samples_per_epoch:
                 break
@@ -125,6 +126,7 @@ class Trainer(BaseTrainer):
         """
         self.model.eval()
         total_val_loss = [0] * len(self.valid_data_loader)
+        total_val_metrics = [np.zeros(len(self.metrics))] * len(self.valid_data_loader)
         meta_arr = {x: [] for x in range(len(self.valid_data_loader))}
         text_embed_arr = {x: [] for x in range(len(self.valid_data_loader))}
         vid_embed_arr = {x: [] for x in range(len(self.valid_data_loader))}

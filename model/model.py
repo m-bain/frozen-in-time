@@ -1,13 +1,12 @@
-import timm
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import AutoModel
-
 from base import BaseModel
-from model.video_transformer import SpaceTimeTransformer
 from utils.util import state_dict_data_parallel_fix
-
+from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification, BertForSequenceClassification, \
+    BertTokenizer, T5EncoderModel
+import torch
+import timm
+from model.video_transformer import SpaceTimeTransformer
 
 class FrozenInTime(BaseModel):
     def __init__(self,
