@@ -29,7 +29,7 @@ class MaxMarginRankingLoss(nn.Module):
     def __init__(self, margin=1, fix_norm=True):
         super().__init__()
         self.fix_norm = fix_norm
-        self.loss = th.nn.MarginRankingLoss(margin)
+        self.loss = nn.MarginRankingLoss(margin)
         self.margin = margin
 
     def forward(self, x):
