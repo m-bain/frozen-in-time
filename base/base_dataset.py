@@ -1,8 +1,6 @@
 import os
 import random
-import tarfile
 from abc import abstractmethod
-from io import BytesIO
 
 import av
 import cv2
@@ -26,7 +24,7 @@ class TextVideoDataset(Dataset):
                  cut=None,
                  subsample=1,
                  sliding_window_stride=-1,
-                 reader='cv2'
+                 reader='decord'
                  ):
         self.dataset_name = dataset_name
         self.text_params = text_params
@@ -97,13 +95,15 @@ class TextVideoDataset(Dataset):
 
         try:
             if os.path.isfile(video_fp):
-                imgs, idxs = self.video_reader(video_fp, self.video_params['num_frames'], frame_sample, fix_start=fix_start)
+                imgs, idxs = self.video_reader(video_fp, self.video_params['num_frames'], frame_sample,
+                                               fix_start=fix_start)
             else:
                 print(f"Warning: missing video file {video_fp}.")
                 assert False
         except Exception as e:
             if video_loading == 'strict':
-                raise ValueError(f'Video loading failed for {video_fp}, video loading for this dataset is strict.') from e
+                raise ValueError(
+                    f'Video loading failed for {video_fp}, video loading for this dataset is strict.') from e
             else:
                 imgs = Image.new('RGB', (self.video_params['input_res'], self.video_params['input_res']), (0, 0, 0))
                 imgs = transforms.ToTensor()(imgs).unsqueeze(0)
@@ -142,101 +142,6 @@ class TextImageDataset(TextVideoDataset):
         img = transforms.ToTensor()(img).unsqueeze(0)
         if self.transforms is not None:
             img = self.transforms(img)
-        meta_arr = {'raw_captions': caption, 'paths': rel_fp, 'dataset': self.dataset_name}
-        data = {'video': img, 'text': caption, 'meta': meta_arr}
-        return data
-
-
-class TextImageTarDataset(TextVideoDataset):
-    """
-    Borrowed from https://github.com/jotaf98/simple-tar-dataset
-    by Joao F. Henriques
-    """
-
-    def __init__(self,
-                 dataset_name,
-                 text_params,
-                 video_params,
-                 data_dir,
-                 tar_fn='images.tar',
-                 metadata_dir=None,
-                 split='train',
-                 tsfms=None,
-                 cut=None,
-                 subsample=1,
-                 sliding_window_stride=-1,
-                 reader='cv2'
-                 ):
-        super().__init__(dataset_name, text_params, video_params, data_dir, metadata_dir, split, tsfms, cut, subsample,
-                         sliding_window_stride, reader)
-
-        worker = get_worker_info()
-        worker = worker.id if worker else None
-        archive = os.path.join(self.data_dir, tar_fn)
-        self.tar_obj = {worker: tarfile.open(archive)}
-        self.archive = archive
-        # store headers of all files and folders by name
-        #members = sorted(self.tar_obj[worker].getmembers(), key=lambda m: m.name)
-        #self.members_by_name = {m.name: m for m in members}
-
-    def get_file(self, name):
-        """Read an arbitrary file from the Tar archive.
-        Args:
-          name (str): File name to retrieve.
-        Returns:
-          io.BufferedReader: Object used to read the file's content.
-        """
-        # ensure a unique file handle per worker, in multiprocessing settings
-        worker = get_worker_info()
-        worker = worker.id if worker else None
-
-        if worker not in self.tar_obj:
-            self.tar_obj[worker] = tarfile.open(self.archive)
-
-        return self.tar_obj[worker].extractfile(self.members_by_name[name])
-
-    def get_image(self, name):
-        """Read an image from the Tar archive, returned as a PIL image or PyTorch tensor.
-        Args:
-          name (str): File name to retrieve.
-        Returns:
-          Image or Tensor: The image in PIL format.
-        """
-        image = Image.open(BytesIO(self.get_file(name).read()))
-        return image
-
-    def __getitem__(self, item):
-        """Return a single sample.
-
-        Should be overriden by a subclass to support custom data other than images (e.g.
-        class labels). The methods get_image/get_file can be used to read from the Tar
-        archive, and a dict of files/folders is held in the property members_by_name.
-        By default, this simply applies the given transforms or converts the image to
-        a tensor if none are specified.
-        Args:
-          item (int): Index of item.
-
-        Returns:
-          Tensor: The image.
-        """
-        item = item % len(self.metadata)
-        sample = self.metadata.iloc[item]
-        video_fp, rel_fp = self._get_video_path(sample)
-        caption = self._get_caption(sample)
-
-        video_loading = self.video_params.get('loading', 'strict')
-
-        try:
-            img = self.get_image(rel_fp)
-        except:
-            if video_loading == 'strict':
-                raise ValueError(f'Image loading failed for {video_fp}, image loading for this dataset is strict.')
-            else:
-                img = Image.new('RGB', (self.video_params['input_res'], self.video_params['input_res']), (0, 0, 0))
-        img = img.convert('RGB')  # if it's grayscale, convert to RGB
-        if self.transforms is not None:  # apply any custom transforms
-            img = self.transforms(img)
-
         meta_arr = {'raw_captions': caption, 'paths': rel_fp, 'dataset': self.dataset_name}
         data = {'video': img, 'text': caption, 'meta': meta_arr}
         return data

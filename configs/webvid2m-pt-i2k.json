@@ -27,7 +27,6 @@
                     "args":{
                         "dataset_name": "WebVid",
                         "data_dir": "data/WebVid",
-                        "reader": "cv2",
                         "shuffle": true,
                         "num_workers": 16,
                         "batch_size": 448,
