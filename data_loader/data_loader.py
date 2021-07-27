@@ -16,7 +16,7 @@ def dataset_loader(dataset_name,
                    cut=None,
                    subsample=1,
                    sliding_window_stride=-1,
-                   reader='cv2'):
+                   reader='decord'):
     kwargs = dict(
         dataset_name=dataset_name,
         text_params=text_params,
@@ -66,7 +66,7 @@ class TextVideoDataLoader(BaseDataLoaderExplicitSplit):
                  cut=None,
                  subsample=1,
                  sliding_window_stride=-1,
-                 reader='cv2',
+                 reader='decord',
                  batch_size=1,
                  num_workers=1,
                  shuffle=True):
