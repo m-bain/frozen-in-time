@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from torch import nn
+from tqdm.auto import tqdm
 
 from base import BaseTrainer
 from model.model import sim_matrix
@@ -36,7 +37,6 @@ class Trainer(BaseTrainer):
         self.visualizer = visualizer
         self.val_chunking = True
         self.batch_size = self.data_loader[0].batch_size
-        self.log_step = int(np.sqrt(self.batch_size))
         self.total_batch_sum = sum(x.batch_size for x in self.data_loader)
         self.tokenizer = tokenizer
         self.max_samples_per_epoch = max_samples_per_epoch
@@ -67,39 +67,39 @@ class Trainer(BaseTrainer):
         """
         self.model.train()
         total_loss = [0] * len(self.data_loader)
-        for batch_idx, data_li in enumerate(zip(*self.data_loader)):
-            if (batch_idx + 1) * self.total_batch_sum > self.max_samples_per_epoch:
-                break
-            for dl_idx, data in enumerate(data_li):
-                # then assume we must tokenize the input, e.g. its a string
-                if self.tokenizer is not None:
-                    data['text'] = self.tokenizer(data['text'], return_tensors='pt', padding=True,
-                                                  truncation=True)
-                data['text'] = {key: val.to(self.device) for key, val in data['text'].items()}
-                data['video'] = data['video'].to(self.device)
+        total_iterations = self.max_samples_per_epoch // self.total_batch_sum + 1
+        with tqdm(zip(*self.data_loader), desc=f"Training epoch {epoch}", total=total_iterations) as progress:
+            for batch_idx, data_li in enumerate(progress):
+                if (batch_idx + 1) * self.total_batch_sum > self.max_samples_per_epoch:
+                    break
+                for dl_idx, data in enumerate(data_li):
+                    # then assume we must tokenize the input, e.g. its a string
+                    if self.tokenizer is not None:
+                        data['text'] = self.tokenizer(data['text'], return_tensors='pt', padding=True,
+                                                      truncation=True)
+                    data['text'] = {key: val.to(self.device) for key, val in data['text'].items()}
+                    data['video'] = data['video'].to(self.device)
 
-                self.optimizer.zero_grad()
-                text_embeds, video_embeds = self.model(data)
-                output = sim_matrix(text_embeds, video_embeds)
-                loss = self.loss(output)
-                loss.backward()
-                self.optimizer.step()
-                if self.writer is not None:
-                    self.writer.log_scalar(f'loss_train_{dl_idx}', loss.detach().item())
+                    self.optimizer.zero_grad()
+                    text_embeds, video_embeds = self.model(data)
+                    output = sim_matrix(text_embeds, video_embeds)
+                    loss = self.loss(output)
+                    loss.backward()
+                    self.optimizer.step()
 
-                total_loss[dl_idx] += loss.detach().item()
+                    detached_loss = loss.detach().item()
 
-                if batch_idx % self.log_step == 0:
-                    self.logger.debug('Train Epoch: {} dl{} {} Loss: {:.6f}'.format(
-                        epoch,
-                        dl_idx,
-                        self._progress(batch_idx, dl_idx),
-                        loss.detach().item()))
+                    if self.writer is not None:
+                        self.writer.log_scalar(f'loss_train_{dl_idx}', detached_loss.item())
 
-                self.optimizer.zero_grad()
+                    total_loss[dl_idx] += detached_loss.item()
 
-            if batch_idx == self.len_epoch:
-                break
+                    progress.set_postfix({"dl": dl_idx, "loss": detached_loss})
+
+                    self.optimizer.zero_grad()
+
+                if batch_idx == self.len_epoch:
+                    break
 
         log = {
             f'loss_{dl_idx}': total_loss[dl_idx] / self.len_epoch for dl_idx in range(len(self.data_loader))
@@ -133,7 +133,7 @@ class Trainer(BaseTrainer):
             # for validation we switch the nested loop order, because alternate batches not needed...
             # ... and dataloaders can be of different length
             for dl_idx, dl in enumerate(self.valid_data_loader):
-                for batch_idx, data in enumerate(dl):
+                for data in tqdm(dl, desc=f"Validating dl{dl_idx}"):
                     meta_arr[dl_idx].append(data['meta'])
                     if self.tokenizer is not None:
                         data['text'] = self.tokenizer(data['text'], return_tensors='pt', padding=True, truncation=True)
