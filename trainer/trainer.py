@@ -140,10 +140,20 @@ class Trainer(BaseTrainer):
                     data['text'] = {key: val.to(self.device) for key, val in data['text'].items()}
                     data['video'] = data['video'].to(self.device)
 
-                    if isinstance(self.model, nn.DataParallel) and data["video"].shape[0] < len(self.model.device_ids):
-                        # Note that if some batch has size smaller than the GPU size, `DataParallel` will fail.
-                        # It can happen with the last batch of the dataset, depending on its size.
-                        # This avoids using `DataParallel` in this case, and supposes the entire batch fits in one GPU.
+                    # Note that if the batch is not scattered among all the GPUs, `DataParallel` will fail because
+                    # the model's mandatory argument `data` will not be passed to some of them.
+                    # It can happen with the last batch of the dataset, depending on its size.
+                    # It could be safely ignored during training but on validation/test we want accurate metrics.
+                    # This avoids using `DataParallel` in this case, and supposes this batch fits in one GPU.
+                    current_batch_size = data['video'].shape[0]
+                    if isinstance(self.model, nn.DataParallel) and current_batch_size < (dl.batch_size or 1):
+                        scattered_len = len(self.model.scatter([torch.empty(current_batch_size)], {},
+                                                               self.model.device_ids)[0])
+                        avoid_data_parallel = scattered_len < len(self.model.device_ids)
+                    else:
+                        avoid_data_parallel = False
+
+                    if avoid_data_parallel:
                         text_embed, vid_embed = self.model.module(data, return_embeds=True)
                     else:
                         text_embed, vid_embed = self.model(data, return_embeds=True)
