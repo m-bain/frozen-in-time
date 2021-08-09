@@ -8,7 +8,7 @@ Repository containing the code, models, data for end-to-end retrieval. WebVid da
 ----
 ### 📝 Preparation 
 
-1. Create conda env `conda env create -f requirements/frozen.yml`
+1. Create conda env `conda env create`
 
 2. Create data / experiment folders `mkdir data; mkdir exps`, note this can just be a symlink to where you want to store big data.
 
