@@ -13,17 +13,23 @@ from model.model import sim_matrix
 from parse_config import ConfigParser
 from trainer.trainer import verbose
 from utils.util import state_dict_data_parallel_fix
+import numpy as np
+import os
 
 ex = Experiment('test')
 
+
 @ex.main
 def run():
-
     # setup data_loader instances
-    config._config['data_loader']['args']['split'] = 'test'
+    config._config['data_loader']['args']['split'] = args.split
+    config._config['data_loader']['args']['tsfm_split'] = 'test'  # set transform to test split to remove augmentations
     config._config['data_loader']['args']['shuffle'] = False
-    config._config['data_loader']['args']['sliding_window_stride'] = config._config['sliding_window_stride']
+    config._config['data_loader']['args']['batch_size'] = args.batch_size
+    config._config['data_loader']['args']['sliding_window_stride'] = args.sliding_window_stride
+
     data_loader = config.initialize('data_loader', module_data)
+
     tokenizer = transformers.AutoTokenizer.from_pretrained(config['arch']['args']['text_params']['model'])
 
     # build model architecture
@@ -32,7 +38,7 @@ def run():
     # get function handles of loss and metrics
     metric_fns = [getattr(module_metric, met) for met in config['metrics']]
 
-    #logger.info('Loading checkpoint: {} ...'.format(config.resume))
+    # logger.info('Loading checkpoint: {} ...'.format(config.resume))
 
     if config.resume is not None:
         checkpoint = torch.load(config.resume)
@@ -67,16 +73,16 @@ def run():
                 data['video'] = data['video'].to(device)
 
             text_embed, vid_embed = model(data, return_embeds=True)
-            text_embed_arr.append(text_embed)
-            vid_embed_arr.append(vid_embed)
+            text_embed_arr.append(text_embed.cpu().detach())
+            vid_embed_arr.append(vid_embed.cpu().detach())
 
     text_embeds = torch.cat(text_embed_arr)
     vid_embeds = torch.cat(vid_embed_arr)
 
     mask = None
     if data_loader.dataset.sliding_window_stride != -1:
-        cpu_vid_embeds = vid_embeds.cpu().detach()
-        cpu_text_embeds = text_embeds.cpu().detach()
+        cpu_vid_embeds = vid_embeds
+        cpu_text_embeds = text_embeds
 
         li_vid_embeds = [x for x in cpu_vid_embeds]
         li_txt_embeds = [x for x in cpu_text_embeds]
@@ -97,21 +103,34 @@ def run():
                 ttembeds = torch.stack(cdf['txt_embed'].values.tolist())
                 new_txt_embeds.append(ttembeds[0])
 
-        vid_embeds = torch.stack(new_vid_embeds).cuda()
-        text_embeds = torch.stack(new_txt_embeds).cuda()
+        vid_embeds = torch.stack(new_vid_embeds)
+        text_embeds = torch.stack(new_txt_embeds)
 
-    sims = sim_matrix(text_embeds, vid_embeds)
-    sims = sims.detach().cpu().numpy()
+    if args.split != 'train':  # because train is usually too big
+        sims = sim_matrix(text_embeds, vid_embeds)
+        sims = sims.numpy()
 
-    nested_metrics = {}
-    for metric in metric_fns:
-        metric_name = metric.__name__
-        res = metric(sims, query_masks=mask)
-        verbose(epoch=0, metrics=res, name="", mode=metric_name)
-        nested_metrics[metric_name] = res
+        nested_metrics = {}
+        for metric in metric_fns:
+            metric_name = metric.__name__
+            res = metric(sims, query_masks=mask)
+            verbose(epoch=0, metrics=res, name="", mode=metric_name)
+            nested_metrics[metric_name] = res
 
-    #if config.config['visualizer']:
+    # if config.config['visualizer']:
     #    raise NotImplementedError
+    if args.save_feats is not None:
+        vid_embeds = vid_embeds.cpu().detach().numpy()
+        text_embeds = text_embeds.cpu().detach().numpy()
+        vid_embeds_save_fp = os.path.join(args.save_feats, f'vid_embeds_{data_loader.dataset.split}.npy')
+        txt_embeds_save_fp = os.path.join(args.save_feats, f'txt_embeds_{data_loader.dataset.split}.npy')
+
+        np.save(vid_embeds_save_fp, vid_embeds)
+        np.save(txt_embeds_save_fp, text_embeds)
+
+        videoids = pd.Series([x['paths'] for x in meta_arr]).explode()
+        videoids.to_csv(os.path.join(args.save_feats, f'ids_{data_loader.dataset.split}.csv'), index=False)
+
 
 if __name__ == '__main__':
     args = argparse.ArgumentParser(description='PyTorch Template')
@@ -124,7 +143,12 @@ if __name__ == '__main__':
                       help='config file path (default: None)')
     args.add_argument('-s', '--sliding_window_stride', default=-1, type=int,
                       help='test time temporal augmentation, repeat samples with different start times.')
-
+    args.add_argument('--save_feats', default=None,
+                      help='path to store video feats')
+    args.add_argument('--split', default='test', choices=['train', 'val', 'test'],
+                      help='split to evaluate on.')
+    args.add_argument('--batch_size', default=16, type=int,
+                      help='size of batch')
     config = ConfigParser(args, test=True)
     # hack to get sliding into config
     args = args.parse_args()
