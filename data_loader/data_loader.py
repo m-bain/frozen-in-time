@@ -63,6 +63,7 @@ class TextVideoDataLoader(BaseDataLoaderExplicitSplit):
                  metadata_dir=None,
                  split='train',
                  tsfm_params=None,
+                 tsfm_split=None,
                  cut=None,
                  subsample=1,
                  sliding_window_stride=-1,
@@ -73,7 +74,10 @@ class TextVideoDataLoader(BaseDataLoaderExplicitSplit):
         if tsfm_params is None:
             tsfm_params = {}
         tsfm_dict = init_transform_dict(**tsfm_params)
-        tsfm = tsfm_dict[split]
+
+        if tsfm_split is None:
+            tsfm_split = split
+        tsfm = tsfm_dict[tsfm_split]
         dataset = dataset_loader(dataset_name, text_params, video_params, data_dir, metadata_dir, split, tsfm, cut,
                                  subsample, sliding_window_stride, reader)
         #        if split != 'train':
