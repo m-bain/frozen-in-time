@@ -90,9 +90,9 @@ class Trainer(BaseTrainer):
                     detached_loss = loss.detach().item()
 
                     if self.writer is not None:
-                        self.writer.log_scalar(f'loss_train_{dl_idx}', detached_loss.item())
+                        self.writer.log_scalar(f'loss_train_{dl_idx}', detached_loss)
 
-                    total_loss[dl_idx] += detached_loss.item()
+                    total_loss[dl_idx] += detached_loss
 
                     progress.set_postfix({"dl": dl_idx, "loss": detached_loss})
 
