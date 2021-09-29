@@ -80,13 +80,11 @@ If you want to activate this:
 If you use this code in your research, please cite:
 
 ```bibtex
-@misc{bain2021frozen,
-      title={Frozen in Time: A Joint Video and Image Encoder for End-to-End Retrieval}, 
-      author={Max Bain and Arsha Nagrani and Gül Varol and Andrew Zisserman},
-      year={2021},
-      eprint={2104.00650},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+@InProceedings{Bain21,
+  author       = "Max Bain and Arsha Nagrani and G{\"u}l Varol and Andrew Zisserman",
+  title        = "Frozen in Time: A Joint Video and Image Encoder for End-to-End Retrieval",
+  booktitle    = "IEEE International Conference on Computer Vision",
+  year         = "2021",
 }
 ```
 
