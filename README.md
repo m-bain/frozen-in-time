@@ -1,7 +1,7 @@
 # Frozen️ in Time ❄️️️️️⏳
 A Joint Video and Image Encoder for End-to-End Retrieval
 ----
-project page | [arXiv](https://arxiv.org/abs/2104.00650) | [webvid-data](https://github.com/m-bain/webvid)
+[project page](https://www.robots.ox.ac.uk/~vgg/research/frozen-in-time/) | [paper](https://arxiv.org/abs/2104.00650) | [dataset](https://github.com/m-bain/webvid) |  [demo](http://meru.robots.ox.ac.uk/frozen-in-time/)
 ![alt text](arch.jpg)
 Repository containing the code, models, data for end-to-end retrieval. WebVid data can be found [here](https://m-bain.github.io/webvid-dataset/)
 
