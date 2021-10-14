@@ -35,8 +35,9 @@ For finetuning a pretrained model, set `"load_checkpoint": "PATH_TO_MODEL"` in t
     
     **a. Dataset combinations**
     
-        i. CC-3M + WebVid2M: configs/cc-webvid2m-pt-i2k.json
+        i. WebVid2M + CC-3M. : configs/cc-webvid2m-pt-i2k.json
         ii. WebVid2M : configs/webvid2m-pt-i2k.json
+        iii. WebVid + CC-3M + COCO: Coming soon
         
     You can add in an arbitrary number of image/video datasets for pre-training by adding as many dataloaders to the config file dataloader list as your heart desires. Adding more datasets will likely to higher downstream performance. 
     
@@ -56,13 +57,16 @@ For finetuning a pretrained model, set `"load_checkpoint": "PATH_TO_MODEL"` in t
 
 ### 🗄 Pretrained Weights
 
- * [CC-3M+WebVid-2M, 4-frames, base_patch_16_224](https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/models/cc-webvid2m-4f_stformer_b_16_224.pth.tar)
+
+ * [WebVid2M+CC3M+COCO, 4-frames, base_patch_16_224](https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/models/cc-webvid-2m-coco_stformer_b_16_224.pth.tar)
+ * [WebVid2M+CC3M, 4-frames, base_patch_16_224](https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/models/cc-webvid2m-4f_stformer_b_16_224.pth.tar)
+ * [WebVid2M, 4-frames, base_patch_16_224](https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/models/webvid2m-4f_stformer_b_16_224.pth.tar)
 
 ### 📚 Curriculum Learning on #frames
     
 Curriculum learning on the number of frames in pretraining achieves similar performance with significant reduction in compute (both memory and training time). This is because model has higher throughput for fewer frames, as well as allowing a bigger batch size for the same gpu memory.
 
-Our best model was trained on 1-frame then finetuned on 4-frames on CC+WebVid2M.
+Our best model was trained on 1-frame then finetuned on 4-frames on WebVid2M+CC3M+COCO ([see camera ready](https://openaccess.thecvf.com/content/ICCV2021/papers/Bain_Frozen_in_Time_A_Joint_Video_and_Image_Encoder_for_ICCV_2021_paper.pdf)).
 
 Train on 1-frame until the training loss converges, then finetune on 4-frames with the same config, from the 1-frame checkpoint via setting `load_checkpoint` in config file. 4-frame finetuning needs much less iterations (~10% of 1-frame setting is sufficient) since most of the knowledge is learned in the 1-frame setting.
 
