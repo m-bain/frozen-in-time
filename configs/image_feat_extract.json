@@ -1,0 +1,73 @@
+{
+    "name": "ImageDirectoryFeatureExtraction",
+    "n_gpu": 1,
+    "arch": {
+        "type": "FrozenInTime",
+        "args": {
+            "video_params": {
+                "model": "SpaceTimeTransformer",
+                "arch_config": "base_patch16_224",
+                "num_frames": 4,
+                "pretrained": true,
+                "time_init": "zeros"
+            },
+            "text_params": {
+                "model": "distilbert-base-uncased",
+                "pretrained": true,
+                "input": "text"
+            },
+            "projection": "minimal",
+            "load_checkpoint" : "/work/maxbain/Libs/frozen-in-time/SS_21/models/CC-WebVid2M-4f-pt1f/0522_143949/checkpoint-epoch6.pth"
+        }
+    },
+    "data_loader": {
+        "type": "TextVideoDataLoader",
+        "args":{
+            "dataset_name": "ImageDirectory",
+            "data_dir": "",
+            "shuffle": true,
+            "num_workers": 16,
+            "batch_size": 16,
+            "split": "test",
+            "subsample": 1,
+            "text_params": {
+                "input": "text"
+            },
+            "video_params": {
+                "input_res": 224,
+                "num_frames": 1
+            }
+        }
+    },
+    "optimizer": {
+        "type": "AdamW",
+        "args":{
+            "lr": 3e-5
+        }
+    },
+    "loss": {
+        "type": "NormSoftmaxLoss",
+        "args": {
+        }
+    },
+    "metrics": [
+        "t2v_metrics",
+        "v2t_metrics"
+     ],
+    "trainer": {
+        "epochs": 100,
+        "max_samples_per_epoch": 9000,
+        "save_dir": "/work/maxbain/Libs/frozen-in-time",
+        "save_period": 5,
+        "verbosity": 2,
+        "monitor": "min val_loss_0",
+        "early_stop": 10,
+        "neptune": true
+    },
+    "visualizer": {
+        "type": "",
+        "args": {
+        }
+    }
+
+}
