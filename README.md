@@ -94,6 +94,9 @@ If you use this code in your research, please cite:
 }
 ```
 
+## LICENSE
+This project is licensed under the MIT License. See LICENSE for more details
+
 
 ## 🙏 Acknowledgements
 
