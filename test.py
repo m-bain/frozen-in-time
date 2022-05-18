@@ -15,7 +15,6 @@ from trainer.trainer import verbose
 from utils.util import state_dict_data_parallel_fix
 import numpy as np
 import os
-from utils.visualisation import visualise_text_video_sim
 import copy
 
 ex = Experiment('test')

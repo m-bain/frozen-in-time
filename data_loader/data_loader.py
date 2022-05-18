@@ -18,8 +18,7 @@ def dataset_loader(dataset_name,
                    cut=None,
                    subsample=1,
                    sliding_window_stride=-1,
-                   reader='decord',
-                   text_only=False):
+                   reader='decord'):
     kwargs = dict(
         dataset_name=dataset_name,
         text_params=text_params,
@@ -32,7 +31,6 @@ def dataset_loader(dataset_name,
         subsample=subsample,
         sliding_window_stride=sliding_window_stride,
         reader=reader,
-        text_only=text_only
     )
 
     # TODO: change to...
@@ -76,7 +74,6 @@ class TextVideoDataLoader(BaseDataLoaderExplicitSplit):
                  num_workers=1,
                  prefetch_factor=2,
                  shuffle=True,
-                 text_only=False,
                  val_batch_size=None):
         if tsfm_params is None:
             tsfm_params = {}
@@ -86,7 +83,7 @@ class TextVideoDataLoader(BaseDataLoaderExplicitSplit):
             tsfm_split = split
         tsfm = tsfm_dict[tsfm_split]
         dataset = dataset_loader(dataset_name, text_params, video_params, data_dir, metadata_dir, split, tsfm, cut,
-                                 subsample, sliding_window_stride, reader, text_only)
+                                 subsample, sliding_window_stride, reader)
         #        if split != 'train':
         #            shuffle = False
         if val_batch_size is not None and split == 'val':
