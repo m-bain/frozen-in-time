@@ -1,4 +1,4 @@
-from base import BaseDataLoaderExplicitSplit, BaseMultiDataLoader, BaseDataLoaderStyleText
+from base import BaseDataLoaderExplicitSplit, BaseMultiDataLoader
 from data_loader.ConceptualCaptions_dataset import ConceptualCaptions3M, ConceptualCaptions12M
 from data_loader.LSMDC_dataset import LSMDC
 from data_loader.MSRVTT_dataset import MSRVTT
@@ -114,41 +114,6 @@ class TextVideoDataLoader(BaseDataLoaderExplicitSplit):
 
         super().__init__(dataset, batch_size, shuffle, num_workers, prefetch_factor=prefetch_factor)
         self.dataset_name = dataset_name
-
-
-class StylisedTextVideoDataLoader(BaseDataLoaderStyleText):
-    def __init__(self,
-                 dataset_name,
-                 style_dataset_params,
-                 text_params,
-                 video_params,
-                 data_dir,
-                 metadata_dir=None,
-                 split='train',
-                 tsfm_params=None,
-                 tsfm_split=None,
-                 cut=None,
-                 subsample=1,
-                 sliding_window_stride=-1,
-                 reader='decord',
-                 batch_size=1,
-                 num_workers=1,
-                 shuffle=True):
-
-
-        if batch_size != style_dataset_params['batch_size']:
-            raise ValueError("Batch sizes for text-video and style-text dataset should be the same.")
-
-        tv_loader = TextVideoDataLoader(dataset_name=dataset_name, text_params=text_params, video_params=video_params,
-                                        data_dir=data_dir, metadata_dir=metadata_dir, split=split,
-                                        tsfm_params=tsfm_params, tsfm_split=tsfm_split, cut=cut, subsample=subsample,
-                                        sliding_window_stride=sliding_window_stride, reader=reader,
-                                        batch_size=batch_size, num_workers=num_workers, shuffle=shuffle,
-                                        text_only=False)
-        #        if split != 'train':
-        #            shuffle = False
-        tt_loader = TextVideoDataLoader(**style_dataset_params, text_only=True)
-        super().__init__(tv_loader, tt_loader)
 
 
 class TextVideoMultiDataLoader(BaseMultiDataLoader):
