@@ -1,5 +1,5 @@
 from base import BaseDataLoaderExplicitSplit, BaseMultiDataLoader
-from data_loader.ConceptualCaptions_dataset import ConceptualCaptions3M, ConceptualCaptions12M
+from data_loader.ConceptualCaptions_dataset import ConceptualCaptions3M
 from data_loader.LSMDC_dataset import LSMDC
 from data_loader.MSRVTT_dataset import MSRVTT
 from data_loader.WebVid_dataset import WebVid
@@ -44,34 +44,14 @@ def dataset_loader(dataset_name,
         dataset = WebVid(**kwargs)
     elif dataset_name == "ConceptualCaptions3M":
         dataset = ConceptualCaptions3M(**kwargs)
-    elif dataset_name == "CondensedMovies":
-        dataset = CondensedMovies(**kwargs)
-    elif dataset_name == "CondensedMoviesShots":
-        dataset = CondensedMoviesShots(**kwargs)
-    elif dataset_name == "CondensedMoviesSwap":
-        dataset = CondensedMoviesSwap(**kwargs)
     elif dataset_name == "LSMDC":
         dataset = LSMDC(**kwargs)
-    elif dataset_name == "COCOCaptions":
-        dataset = COCOCaptions(**kwargs)
     # ---experimental--- not for public
-    elif dataset_name == "ConceptualCaptions12M":
-        dataset = ConceptualCaptions12M(**kwargs)
-    elif dataset_name == "SBUCaptions":
-        dataset = SBUCaptions(**kwargs)
-    elif dataset_name == "VisualGenome":
-        dataset = VisualGenome(**kwargs)
     elif dataset_name == "VideoDirectory":
         dataset = VideoDirectory(**kwargs)
-    elif dataset_name == "CMDShotFeats":
-        dataset = CMDShotFeats(**kwargs)
-    elif dataset_name == "ActivityNet":
         dataset = ActivityNet(**kwargs)
     elif dataset_name == "ImageDirectory":
         dataset = ImageDirectory(**kwargs)
-    # elif dataset_name == "SomethingSomethingV2":
-    #    dataset = SomethingSomethingV2(**kwargs)
-    # ---------------------------------------------
     else:
         raise NotImplementedError(f"Dataset: {dataset_name} not found.")
 
