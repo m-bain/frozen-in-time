@@ -99,14 +99,12 @@ def run():
             else:
                 data['video'] = data['video'].to(device)
 
-            output = model(data)
-            text_embed_arr.append(output['text'].cpu().detach())
-            vid_embed_arr.append(output['video'].cpu().detach())
+            text_embeds, vid_embeds = model(data)
+            text_embed_arr.append(text_embeds.cpu().detach())
+            vid_embed_arr.append(vid_embeds.cpu().detach())
 
             # meta stuff
             meta_arr.append(data['meta'])
-            text_mask_arr.append(data['text']['attention_mask'].cpu())
-            vid_mask_arr.append(data['video_mask'])
 
             ctr += len(data['video'])
             # save every 1mil samples to avoid OOM
@@ -135,7 +133,6 @@ def run():
                 save_part += 1
 
     vid_embeds = torch.cat(vid_embed_arr)
-    vid_masks = torch.cat(vid_mask_arr)
 
     meta_arr_cat = {key: [] for key in meta_arr[0].keys()}
     for meta in meta_arr:
@@ -151,15 +148,7 @@ def run():
         else:
             raise NotImplementedError
 
-    similarity_type = config._config['loss']['args'].get("similarity", "single")
-    from torch import nn
-    max_txt_len = max([x.shape[1] for x in text_mask_arr])
-    for idx, txt_mask in enumerate(text_mask_arr):
-        to_pad = max_txt_len - txt_mask.shape[1]
-        # move tokens to last dim, pad, then move tokens back to mid dim
-        text_mask_arr[idx] = nn.functional.pad(txt_mask, (0, to_pad))
     text_embeds = torch.cat(text_embed_arr)
-    text_masks = torch.cat(text_mask_arr)
     mask = None
     if data_loader.dataset.sliding_window_stride != -1:
         cpu_vid_embeds = vid_embeds
@@ -167,56 +156,39 @@ def run():
 
         li_vid_embeds = [x for x in cpu_vid_embeds]
         li_txt_embeds = [x for x in cpu_text_embeds]
-        li_vid_masks = [x for x in vid_masks]
-        li_txt_masks = [x for x in text_masks]
         videoids = pd.Series(meta_arr['paths'])
         raw_caps = pd.Series(meta_arr['raw_captions'])
-        vid_df = pd.DataFrame({'videoid': videoids, 'vid_embed': li_vid_embeds, 'txt_embed': li_txt_embeds,
-                               'captions': raw_caps, 'vid_mask': li_vid_masks, 'txt_mask': li_txt_masks})
+        vid_df = pd.DataFrame({'videoid': videoids, 'vid_embed': li_vid_embeds, 'txt_embed': li_txt_embeds,                               'captions': raw_caps})
         new_vid_embeds = []
         new_txt_embeds = []
-        new_vid_masks = []
-        new_txt_masks = []
         for vid in vid_df['videoid'].unique():
             tdf = vid_df[vid_df['videoid'] == vid]
             tvembeds = torch.stack(tdf['vid_embed'].values.tolist())
             tvembeds = tvembeds.mean(dim=0)
             new_vid_embeds.append(tvembeds)
-            tvmasks = torch.stack(tdf['vid_mask'].values.tolist())
-            new_vid_masks.append(tvmasks.max(dim=0)[0])
 
             for cap in tdf['captions'].unique():
                 cdf = vid_df[vid_df['captions'] == cap]
                 ttembeds = torch.stack(cdf['txt_embed'].values.tolist())
                 new_txt_embeds.append(ttembeds[0])
-                ttmasks = torch.stack(cdf['txt_mask'].values.tolist())
-                new_txt_masks.append(ttmasks[0])
 
         vid_embeds = torch.stack(new_vid_embeds)
         text_embeds = torch.stack(new_txt_embeds)
-        vid_masks = torch.stack(new_vid_masks)
-        text_masks = torch.stack(new_txt_masks)
 
     if args.split != 'train':  # because train is usually too big
         chunk = True
         if not chunk:
-            sims, _ = compute_similarity(text_embeds, vid_embeds, text_masks, vid_masks, style=similarity_type,
-                                         return_raw=args.vis_token_similarity)
-            if args.vis_token_similarity:
-                mask = _
+            sims, _ = compute_similarity(text_embeds, vid_embeds, text_masks)
         else:
             chunk_size = 100
             sim_row_arr = []
             for tdx in range(0, len(text_embeds), chunk_size):
                 print(tdx, ' / ', len(text_embeds), ' ...')
                 t_embed = text_embeds[tdx:tdx + chunk_size]
-                t_mask = text_masks[tdx:tdx + chunk_size]
                 sim_row = []
                 for vdx in range(0, len(vid_embeds), chunk_size):
                     v_embed = vid_embeds[vdx:vdx + chunk_size]
-                    v_mask = vid_masks[vdx:vdx + chunk_size]
-                    sim_chunk, _ = compute_similarity(t_embed, v_embed, t_mask, v_mask, style=similarity_type,
-                                                      return_raw=args.vis_token_similarity)
+                    sim_chunk, _ = compute_similarity(t_embed, v_embed)
                     sim_row.append(sim_chunk)
                 sim_row = torch.cat(sim_row, dim=1)
                 sim_row_arr.append(sim_row)
