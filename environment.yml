@@ -17,6 +17,7 @@ dependencies:
   - certifi=2020.12.5=py37h89c1867_1
   - cffi=1.14.5=py37hc58025e_0
   - chardet=4.0.0=py37h89c1867_1
+  - charset-normalizer=2.0.12
   - click=8.0.0=py37h89c1867_0
   - cryptography=3.4.7=py37h5d9358c_0
   - cudatoolkit=11.1.74=h6bb024c_0
@@ -99,7 +100,7 @@ dependencies:
   - pytz=2021.1=pyhd3eb1b0_0
   - readline=8.1=h27cfd23_0
   - regex=2021.4.4=py37h5e8e339_0
-  - requests=2.25.1=pyhd3deb0d_0
+  - requests=2.31.0=pyhd8ed1ab_0
   - sacremoses=0.0.43=pyh9f0ad1d_0
   - scikit-learn=0.24.1=py37ha9443f7_0
   - scipy=1.6.2=py37had2a1c9_1
